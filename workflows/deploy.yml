@@ -1,1 +1,35 @@
+name: Create and Destroy Droplet with API
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Create Droplet
+      id: create_droplet
+      run: |
+        RESPONSE=$(curl -X POST "https://api.digitalocean.com/v2/droplets" \
+          -H "Authorization: Bearer ${{ secrets.DO_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{"name":"github-action-droplet","region":"nyc3","size":"s-1vcpu-1gb","image":"ubuntu-20-04-x64"}')
+        DROPLET_ID=$(echo $RESPONSE | jq '.droplet.id')
+        echo "::set-output name=droplet_id::$DROPLET_ID"
+        echo "Created Droplet ID: $DROPLET_ID"
+
+    - name: Do Something with the Droplet
+      run: |
+        echo "Placeholder for actions with the Droplet ID ${{ steps.create_droplet.outputs.droplet_id }}"
+        # Example: SSH into the droplet or perform any actions you need
+        # You would typically wait for the droplet to become available before attempting SSH connections
+
+    - name: Destroy Droplet
+      if: always()
+      run: |
+        curl -X DELETE "https://api.digitalocean.com/v2/droplets/${{ steps.create_droplet.outputs.droplet_id }}" \
+          -H "Authorization: Bearer ${{ secretsDO_API_KEY }}"
+        echo "Destroyed Droplet ID ${{ steps.create_droplet.outputs.droplet_id }}"
 
