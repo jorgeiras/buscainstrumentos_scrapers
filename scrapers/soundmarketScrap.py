@@ -39,7 +39,7 @@ except Exception as e:
 # Busco el boton para cargar mas informacion
 boton = driver.find_element(By.XPATH, '//button[@class="stw-flex stw-justify-center stw-border stw-border-orange stw-rounded-sm stw-bg-orange stw-p-2 stw-text-center stw-text-lg stw-font-bold stw-text-white stw-mt-10 stw-mx-auto stw-w-60 stw-cursor-pointer hover:stw-bg-orange-light hover:stw-border-orange-light hover:stw-text-white"]')
                
-for i in range(1): # Voy a darle click en cargar mas 3 veces
+for i in range(3): # Voy a darle click en cargar mas 3 veces
     try:
         # le doy click
         boton.click()
