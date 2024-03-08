@@ -15,13 +15,22 @@ def parse_precio(texto):
             texto_nuevo = texto_nuevo.replace(',', '.')
             return texto_nuevo
 
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
+
+
 # Asi podemos setear el user-agent en selenium
-opts = Options()
-opts.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
+#opts = Options()
+#opts.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36")
 
 # Instancio el driver de selenium que va a controlar el navegador
 # A partir de este objeto voy a realizar el web scraping e interacciones
-driver = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options=opts)
+#driver = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options=opts)
 
 # Voy a la pagina que quiero
 driver.get('https://soundsmarket.com/servicios/compraventa/cuerda/guitarras/guitarras-electricas')
