@@ -1,12 +1,9 @@
 from scrapy.item import Field
 from scrapy.item import Item
-from scrapy.spiders import Spider
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from scrapy.selector import Selector
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import MapCompose
-import psycopg2
 import re
 from datetime import datetime, timedelta
 import locale
@@ -38,7 +35,7 @@ class GuitarristasInfoCrawler(CrawlSpider):
 
     rules = {
         Rule(LinkExtractor(allow=r'/anuncios/guitarras-bajos/pagina\d+'), follow=True),
-        Rule(LinkExtractor(allow=r'/anuncios/[\w-]+/\d+'), follow=True, callback='parse_items')
+        Rule(LinkExtractor(allow=r'/anuncios/[\w-]+/\d+', restrict_xpaths=['//div[@id="ads"]']), follow=True, callback='parse_items')
 
     }
 

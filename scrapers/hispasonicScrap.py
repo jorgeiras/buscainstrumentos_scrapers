@@ -37,9 +37,10 @@ class HispanoSonicInfoCrawler(CrawlSpider):
 
     rules = {
         Rule(LinkExtractor(allow=r'/anuncios/guitarras-bajos/pagina\d+'), follow=True),
-        Rule(LinkExtractor(allow=r'/anuncios/[\w-]+/\d+'), follow=True, callback='parse_items')
+        Rule(LinkExtractor(allow=r'/anuncios/[\w-]+/\d+', restrict_xpaths=['//div[@id="ads"]']), follow=True, callback='parse_items')
 
     }
+
 
     def parse_items(self, response):
         item = ItemLoader(Instrumento(), response)
