@@ -20,6 +20,41 @@ jobs:
         echo "::set-output name=droplet_id::$DROPLET_ID"
         echo "Created Droplet ID: $DROPLET_ID"
 
+    - name: Wait for Droplet to become ready
+      run: sleep 60 # Wait for 60 seconds for the droplet to boot up
+
+    - name: Transfer and Set Environment Variables
+      env:
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASS: ${{ secrets.DB_PASS }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_HOST: ${{ secrets.DB_HOST }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        DO_SSH_PRIVATE_KEY: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+      run: |
+        SSH_KEY_PATH=$HOME/.ssh/github_action
+        mkdir -p $HOME/.ssh
+        echo "$DO_SSH_PRIVATE_KEY" > $SSH_KEY_PATH
+        chmod 600 $SSH_KEY_PATH
+        scp -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH <(echo "\
+        export DB_USER=$DB_USER\n\
+        export DB_PASS='$DB_PASS'\n\
+        export DB_NAME=$DB_NAME\n\
+        ") root@${{ steps.create_droplet.outputs.droplet_ip }}:/etc/profile.d/env.sh
+        ssh -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH root@${{ steps.create_droplet.outputs.droplet_ip }} "chmod +x /etc/profile.d/env.sh && source /etc/profile.d/env.sh"
+
+    - name: Clone Repository to Droplet
+      env:
+        SSH_KEY_PATH: ${{ github.workspace }}/.ssh/github_action
+      run: |
+        ssh -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH root@${{ steps.create_droplet.outputs.droplet_ip }} "git clone YOUR_GITHUB_REPO /path/to/repository"
+
+    - name: Execute Setup Script on Droplet
+      env:
+        SSH_KEY_PATH: ${{ github.workspace }}/.ssh/github_action
+      run: |
+        ssh -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH root@${{ steps.create_droplet.outputs.droplet_ip }} "chmod +x /path/to/repository/bash_scripts/setup.sh && /path/to/repository/bash_scripts/setup.sh"
+        
     - name: Do Something with the Droplet
       run: |
         echo "Placeholder for actions with the Droplet ID ${{ steps.create_droplet.outputs.droplet_id }}"
