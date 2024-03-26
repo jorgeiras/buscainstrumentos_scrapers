@@ -1,9 +1,9 @@
 import psycopg2
 import csv
+import os
 
-
-csv_file_path = './reverb.csv'
-csv_file_path_clean = './reverb_clean.csv'
+csv_file_path = '../scrapers/reverb.csv'
+csv_file_path_clean = '../scrapers/reverb_clean.csv'
 
 #clean csv duplicates 
 unique_links = set()
@@ -24,11 +24,11 @@ with open(csv_file_path_clean, 'w', newline='', encoding='utf-8') as f:
 
 
 # connect to database
-conn = psycopg2.connect(database='instrCopyDB', user='postgres', password='admin', host='localhost', port='5432')
+conn = psycopg2.connect(os.environ.get('DB_NAME'), os.environ.get('DB_USER'), os.environ.get('DB_PASS'), os.environ.get('DB_HOST'), os.environ.get('DB_PORT'))
 cursor = conn.cursor()
 
 #creacion de tabla temporal 
-cursor.execute('CREATE TEMP TABLE temp_table_reverb (LIKE "instrCopyAPI_instrument" INCLUDING ALL)')
+cursor.execute('CREATE TEMP TABLE temp_table_reverb (LIKE "buscainstrumentos_API_instrument" INCLUDING ALL)')
 conn.commit()
 
 #cargar data en la tabla temporal 
@@ -42,7 +42,7 @@ conn.commit()
 
 #cargar data de la tabla temporal a la tabla final
 cursor.execute("""
-                INSERT INTO "instrCopyAPI_instrument" (name, price, link, website, image, location, category, expiration, publish)
+                INSERT INTO "buscainstrumentos_API_instrument" (name, price, link, website, image, location, category, expiration, publish)
                 SELECT name, price, link, website, image, location, category, expiration, publish FROM temp_table_reverb
                 ON CONFLICT (link) DO NOTHING;
             """)
