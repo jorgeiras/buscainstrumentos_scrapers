@@ -2,8 +2,8 @@ import psycopg2
 import csv
 import os
 
-csv_file_path = './soundmarket.csv'
-csv_file_path_clean = './soundmarket_clean.csv'
+csv_file_path = '../db_loaders/soundmarket.csv'
+csv_file_path_clean = '../db_loaders/soundmarket_clean.csv'
 
 #clean csv duplicates 
 unique_links = set()
