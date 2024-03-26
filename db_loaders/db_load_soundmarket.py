@@ -28,7 +28,7 @@ conn = psycopg2.connect(database=os.environ.get('DB_NAME'), user=os.environ.get(
 cursor = conn.cursor()
 
 #creacion de tabla temporal 
-cursor.execute('CREATE TEMP TABLE temp_table_soundmarket (LIKE "instrCopyAPI_instrument" INCLUDING ALL)')
+cursor.execute('CREATE TEMP TABLE temp_table_soundmarket (LIKE "buscainstrumentos_API_instrument" INCLUDING ALL)')
 conn.commit()
 
 #cargar data en la tabla temporal 
@@ -42,7 +42,7 @@ conn.commit()
 
 #cargar data de la tabla temporal a la tabla final
 cursor.execute("""
-                INSERT INTO "instrCopyAPI_instrument" (name, price, link, website, image, location, category, expiration, publish)
+                INSERT INTO "buscainstrumentos_API_instrument" (name, price, link, website, image, location, category, expiration, publish)
                 SELECT name, price, link, website, image, location, category, expiration, publish FROM temp_table_soundmarket
                 ON CONFLICT (link) DO NOTHING;
             """)
