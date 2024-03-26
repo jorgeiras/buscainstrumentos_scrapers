@@ -1,6 +1,6 @@
 import psycopg2
 import csv
-
+import os
 
 csv_file_path = './soundmarket.csv'
 csv_file_path_clean = './soundmarket_clean.csv'
@@ -24,7 +24,7 @@ with open(csv_file_path_clean, 'w', newline='', encoding='utf-8') as f:
 
 
 # connect to database
-conn = psycopg2.connect(database='instrCopyDB', user='postgres', password='admin', host='localhost', port='5432')
+conn = psycopg2.connect(os.environ.get('DB_NAME'), os.environ.get('DB_USER'), os.environ.get('DB_PASS'), os.environ.get('DB_HOST'), os.environ.get('DB_PORT'))
 cursor = conn.cursor()
 
 #creacion de tabla temporal 
