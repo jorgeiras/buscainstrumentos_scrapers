@@ -4,7 +4,7 @@ import os
 csv_file_path = '../scrapers/hispasonic.csv'
 
 # connect to database
-conn = psycopg2.connect(os.environ.get('DB_NAME'), os.environ.get('DB_USER'), os.environ.get('DB_PASS'), os.environ.get('DB_HOST'), os.environ.get('DB_PORT'))
+conn = psycopg2.connect(database=os.environ.get('DB_NAME'), user=os.environ.get('DB_USER'), password=os.environ.get('DB_PASS'), host=os.environ.get('DB_HOST'), port=os.environ.get('DB_PORT'))
 cursor = conn.cursor()
 
 #creacion de tabla temporal 
