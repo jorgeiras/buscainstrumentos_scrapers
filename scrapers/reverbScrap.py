@@ -15,7 +15,7 @@ headers = {
 }
 
 
-url_api = 'https://api.reverb.com/api/listings?product_type=electric-guitars'
+url_api = 'https://api.reverb.com/api/listings?product_type=electric-guitars&condition=used'
 
 
 
@@ -38,7 +38,7 @@ def extract_data(product_type,price_min, price_max, writer):
     items_per_page = 50
     
     while page <= numPages:
-        url_api = 'https://api.reverb.com/api/listings?page={}&per_page={}&product_type={}&price_min={}&price_max={}'.format(page,items_per_page,product_type, price_min, price_max)
+        url_api = 'https://api.reverb.com/api/listings?page={}&per_page={}&product_type={}&condition=used&price_min={}&price_max={}'.format(page,items_per_page,product_type, price_min, price_max)
         response = requests.get(url_api, headers=headers)
         if response.status_code != 200:
             print(response.text)
