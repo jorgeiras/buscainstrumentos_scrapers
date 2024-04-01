@@ -1,71 +1,58 @@
-name: Create and Destroy Droplet with API
+name: Deploy and Run Scrapers
 
 on: [push]
 
 jobs:
-  deploy:
+  deploy-and-run:
     runs-on: ubuntu-latest
+    environment: production
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Create Droplet
-      id: create_droplet
-      run: |
-        RESPONSE=$(curl -X POST "https://api.digitalocean.com/v2/droplets" \
-          -H "Authorization: Bearer ${{ secrets.DO_API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{"name":"github-action-droplet","region":"nyc3","size":"s-1vcpu-1gb","image":"ubuntu-20-04-x64","ssh_keys":["4b:f6:47:9b:a3:cc:6a:0a:5b:9f:8d:47:4e:8c:44:5f"]}')
-        DROPLET_ID=$(echo $RESPONSE | jq '.droplet.id')
-        echo "::set-output name=droplet_id::$DROPLET_ID"
-        echo "Created Droplet ID: $DROPLET_ID"
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 'latest'
+          
+      - name: Terraform Init and Apply
+        run: |
+          terraform init
+          terraform apply -auto-approve
+        working-directory: terraformFiles
+        env:
+          TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
 
-    - name: Wait for Droplet to become ready
-      run: sleep 60 # Wait for 60 seconds for the droplet to boot up
+      - name: Get Droplet IP
+        id: get-ip
+        run: echo "::set-output name=droplet_ip::$(terraform output -raw droplet_ip)"
 
-    - name: Transfer and Set Environment Variables
-      env:
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASS: ${{ secrets.DB_PASS }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        DO_SSH_PRIVATE_KEY: ${{ secrets.DO_SSH_PRIVATE_KEY }}
-      run: |
-        SSH_KEY_PATH=$HOME/.ssh/github_action
-        mkdir -p $HOME/.ssh
-        echo "$DO_SSH_PRIVATE_KEY" > $SSH_KEY_PATH
-        chmod 600 $SSH_KEY_PATH
-        scp -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH <(echo "\
-        export DB_USER=$DB_USER\n\
-        export DB_PASS='$DB_PASS'\n\
-        export DB_NAME=$DB_NAME\n\
-        ") root@${{ steps.create_droplet.outputs.droplet_ip }}:/etc/profile.d/env.sh
-        ssh -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH root@${{ steps.create_droplet.outputs.droplet_ip }} "chmod +x /etc/profile.d/env.sh && source /etc/profile.d/env.sh"
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > keyfile.pem
+          chmod 600 keyfile.pem
+          
+      - name: Setup Ansible Inventory
+        run: |
+          echo "[droplets]" > inventory
+          echo "${{ steps.get-ip.outputs.droplet_ip }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory
 
-    - name: Clone Repository to Droplet
-      env:
-        SSH_KEY_PATH: ${{ github.workspace }}/.ssh/github_action
-      run: |
-        ssh -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH root@${{ steps.create_droplet.outputs.droplet_ip }} "git clone YOUR_GITHUB_REPO /path/to/repository"
-
-    - name: Execute Setup Script on Droplet
-      env:
-        SSH_KEY_PATH: ${{ github.workspace }}/.ssh/github_action
-      run: |
-        ssh -o "StrictHostKeyChecking=no" -i $SSH_KEY_PATH root@${{ steps.create_droplet.outputs.droplet_ip }} "chmod +x /path/to/repository/bash_scripts/setup.sh && /path/to/repository/bash_scripts/setup.sh"
-        
-    - name: Do Something with the Droplet
-      run: |
-        echo "Placeholder for actions with the Droplet ID ${{ steps.create_droplet.outputs.droplet_id }}"
-        # Example: SSH into the droplet or perform any actions you need
-        # You would typically wait for the droplet to become available before attempting SSH connections
-
-    - name: Destroy Droplet
-      if: always()
-      run: |
-        echo "Waiting 20 seconds before destroying the Droplet..."
-        sleep 20
-        curl -X DELETE "https://api.digitalocean.com/v2/droplets/${{ steps.create_droplet.outputs.droplet_id }}" \
-          -H "Authorization: Bearer ${{ secrets.DO_API_KEY }}"
-        echo "Destroyed Droplet ID ${{ steps.create_droplet.outputs.droplet_id }}"
+      - name: Run Ansible Playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: 'path/to/your/playbook.yml'
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          directory: 'optional-working-directory'
+          options: 'additional ansible-playbook CLI arguments'
+        env:
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          
+      - name: Destroy Infrastructure
+        if: always()
+        run: terraform destroy -auto-approve
+        env:
+          TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
