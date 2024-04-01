@@ -25,7 +25,9 @@ jobs:
 
       - name: Get Droplet IP
         id: get-ip
-        run: echo "::set-output name=droplet_ip::$(terraform output -raw droplet_ip)"
+        run: |
+          echo "droplet_ip=$(terraform output -raw droplet_ip)" >> $GITHUB_ENV
+
 
       - name: Setup SSH
         run: |
@@ -35,8 +37,8 @@ jobs:
       - name: Setup Ansible Inventory
         run: |
           echo "[droplets]" > inventory
-          echo "${{ steps.get-ip.outputs.droplet_ip }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory
-
+          echo "${{ env.droplet_ip }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory
+          
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
