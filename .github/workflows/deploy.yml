@@ -26,10 +26,12 @@ jobs:
       - name: Output Droplet IP
         run: |
           terraform output -raw droplet_ip
-
+        working-directory: terraformFiles
+        
       - name: Get Droplet IP
         run: echo "DROPLET_IP=$(terraform output -raw droplet_ip)" >> $GITHUB_ENV
-
+        working-directory: terraformFiles
+        
       - name: Debug droplet IP
         run: |
           echo "Droplet IP is ${{ env.DROPLET_IP }}"
