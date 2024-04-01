@@ -27,6 +27,7 @@ jobs:
         id: get-ip
         run: |
           echo "droplet_ip=$(terraform output -raw droplet_ip)" >> $GITHUB_ENV
+        working-directory: terraformFiles
 
 
       - name: Setup SSH
