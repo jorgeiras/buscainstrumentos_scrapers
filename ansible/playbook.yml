@@ -1,0 +1,82 @@
+---
+- name: Setup and Run Scrapers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600 # Cache valid for 1 hour to avoid updating each time
+
+    - name: Install system dependencies
+      apt:
+        name: "{{ packages }}"
+        state: latest
+      vars:
+        packages:
+          - python3
+          - python3-pip
+          - locales
+
+    - name: Install Python packages
+      pip:
+        name: "{{ item }}"
+      with_items:
+        - scrapy
+        - requests_cache
+        - ipython
+        - selenium
+        - webdriver-manager
+        - psycopg2-binary
+
+    - name: Install Google Chrome
+      apt:
+        deb: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+    - name: Clone repository
+      git:
+        repo: 'https://github.com/jorgeiras/buscainstrumentos_scrapers.git'
+        dest: '/home/{{ ansible_user }}/buscainstrumentos_scrapers'
+        clone: yes
+        update: yes
+
+    - name: Generate locale
+      locale_gen:
+        name: es_ES.UTF-8
+        state: present
+
+    - name: Run soundmarketScrap.py scraper
+      command: "python3 soundmarketScrap.py"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+
+    - name: Run reverbScrap.py scraper
+      command: "python3 reverbScrap.py"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+
+    - name: Run hispasonicScrap.py scraper
+      command: "scrapy runspider hispasonicScrap.py -o hispasonic.csv -t csv"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+
+    - name: Run guitarristasScrap.py scraper
+      command: "scrapy runspider guitarristasScrap.py -o guitarristas.csv -t csv"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+
+    - name: Run database loader scripts
+      command: "python3 {{ item }}"
+      args:
+        chdir: '/home/{{ ansible_user }}/buscainstrumentos_scrapers/db_loaders'
+      environment:
+        DB_USER: "{{ lookup('env', 'DB_USER') }}"
+        DB_PASS: "{{ lookup('env', 'DB_PASS') }}"
+        DB_NAME: "{{ lookup('env', 'DB_NAME') }}"
+        DB_HOST: "{{ lookup('env', 'DB_HOST') }}"
+        DB_PORT: "{{ lookup('env', 'DB_PORT') }}"
+      with_items:
+        - 'db_load_guitarristas.py'
+        - 'db_load_hispasonic.py'
+        - 'db_load_reverb.py'
+        - 'db_load_soundmarket.py'
