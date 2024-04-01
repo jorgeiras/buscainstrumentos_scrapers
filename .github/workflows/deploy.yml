@@ -29,7 +29,7 @@ jobs:
 
       - name: Setup SSH
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > keyfile.pem
+          echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile.pem
           chmod 600 keyfile.pem
           
       - name: Setup Ansible Inventory
@@ -40,10 +40,9 @@ jobs:
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          playbook: 'path/to/your/playbook.yml'
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          directory: 'optional-working-directory'
-          options: 'additional ansible-playbook CLI arguments'
+          playbook: 'playbook.yml'
+          key: ${{ secrets.SSH_DO_SCRAP_KEY }}
+          directory: 'ansible'
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
