@@ -1,6 +1,6 @@
 resource "digitalocean_droplet" "my_droplet" {
   image  = "ubuntu-20-04-x64"
-  name   = "example-ubuntu-droplet"
+  name   = "buscainstrumentos-scraper"
   region = "fra1"
   size   = "s-1vcpu-1gb"
   backups = false
