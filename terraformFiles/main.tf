@@ -7,3 +7,8 @@ resource "digitalocean_droplet" "my_droplet" {
   monitoring = true
   ssh_keys = ["4b:f6:47:9b:a3:cc:6a:0a:5b:9f:8d:47:4e:8c:44:5f"]
 }
+
+
+output "droplet_ip" {
+  value = digitalocean_droplet.my_droplet.ipv4_address
+}
