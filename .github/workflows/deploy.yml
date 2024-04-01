@@ -23,16 +23,16 @@ jobs:
         env:
           TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
 
-      - name: Get Droplet IP
-        id: get-ip
+      - name: Output Droplet IP
         run: |
-          IP=$(terraform output -raw droplet_ip)
-          echo "droplet_ip=$IP" >> $GITHUB_ENV
-        working-directory: terraformFiles
+          terraform output -raw droplet_ip
+
+      - name: Get Droplet IP
+        run: echo "DROPLET_IP=$(terraform output -raw droplet_ip)" >> $GITHUB_ENV
 
       - name: Debug droplet IP
         run: |
-          echo "Droplet IP is ${{ env.droplet_ip }}"
+          echo "Droplet IP is ${{ env.DROPLET_IP }}"
 
       - name: Setup SSH
         run: |
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Ansible Inventory
         run: |
           echo "[droplets]" > inventory
-          echo "${{ env.droplet_ip }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory
+          echo "${{ env.DROPLET_IP }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory
           
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
