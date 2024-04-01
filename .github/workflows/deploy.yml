@@ -30,7 +30,9 @@ jobs:
 
       - name: Get Droplet IP
         id: get-ip
-        run: echo "::set-output name=DROPLET_IP::$(terraform output -raw droplet_ip)"
+        run: |
+          IP=$(terraform output -raw droplet_ip | grep -Eo "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+          echo "DROPLET_IP=${IP}" >> $GITHUB_ENV
         working-directory: terraformFiles
         
       - name: Debug droplet IP
