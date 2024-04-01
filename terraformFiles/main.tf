@@ -5,5 +5,5 @@ resource "digitalocean_droplet" "my_droplet" {
   size   = "s-1vcpu-1gb"
   backups = false
   monitoring = true
-  ssh_keys = ["8d:fb:69:bb:b3:9f:18:69:45:c5:0d:81:14:23:95:63"]
+  ssh_keys = ["4b:f6:47:9b:a3:cc:6a:0a:5b:9f:8d:47:4e:8c:44:5f"]
 }
