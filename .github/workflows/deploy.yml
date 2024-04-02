@@ -57,7 +57,7 @@ jobs:
         working-directory: ansible
           
       - name: Run Ansible Playbook
-        run: ansible-playbook playbook.yml -i inventory.yml --private-key=keyfile.pem
+        run: ansible-playbook playbook.yml -i inventory.yml 
         working-directory: 'ansible'
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
