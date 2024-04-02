@@ -78,4 +78,4 @@ jobs:
         run: terraform destroy -auto-approve
         env:
           TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
-        working-directory: terraformFiles
+        working-directory: 'ansible'
