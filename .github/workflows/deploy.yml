@@ -69,6 +69,8 @@ jobs:
             echo "Waiting for SSH to be ready (attempt $ATTEMPTS)..."
             sleep 10
           done
+        working-directory: ansible
+
   
       - name: Run Ansible Playbook
         run: ansible-playbook playbook.yml -i inventory.yml -vvv
