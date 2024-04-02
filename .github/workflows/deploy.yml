@@ -70,6 +70,5 @@ jobs:
       - name: Destroy Infrastructure
         if: always()
         run: terraform destroy -auto-approve
-        working-directory: terraformFiles
         env:
           TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
