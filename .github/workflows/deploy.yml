@@ -41,7 +41,7 @@ jobs:
 
       - name: Setup SSH
         run: |
-          echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile.pem
+          echo -e "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile.pem
           chmod 600 keyfile.pem
         working-directory: ansible
           
