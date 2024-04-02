@@ -48,6 +48,7 @@ jobs:
         run: |
           echo "[droplets]" > inventory
           echo "${{ env.DROPLET_IP }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory
+        working-directory: ansible
           
       - name: Run Ansible Playbook
         uses: dawidd6/action-ansible-playbook@v2
