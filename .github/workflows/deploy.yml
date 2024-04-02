@@ -41,14 +41,14 @@ jobs:
 
       - name: Setup SSH
         run: |
-          echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile.pem
+          echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile
           chmod 600 keyfile.pem
         working-directory: ansible
           
       - name: Setup Ansible Inventory
         run: |
           echo "[droplets]" > inventory.yml
-          echo "${{ env.DROPLET_IP }} ansible_user=root ansible_ssh_private_key_file=./keyfile.pem" >> inventory.yml
+          echo "${{ env.DROPLET_IP }} ansible_user=root ansible_ssh_private_key_file=keyfile" >> inventory.yml
         working-directory: ansible
 
       - name: Print Ansible Inventory
@@ -72,3 +72,4 @@ jobs:
         run: terraform destroy -auto-approve
         env:
           TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
+        working-directory: terraformFiles
