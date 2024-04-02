@@ -38,7 +38,6 @@ jobs:
       - name: Debug droplet IP
         run: |
           echo "Droplet IP is ${{ env.DROPLET_IP }}"
-
       - name: Setup SSH
         run: |
           echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile.pem
