@@ -55,9 +55,15 @@ jobs:
         run: |
           echo "$(cat inventory.yml)"
         working-directory: ansible
-          
+
+      - name: Print working directory and list files
+        run: |
+          pwd
+          ls -lah
+        working-directory: ansible
+  
       - name: Run Ansible Playbook
-        run: ansible-playbook playbook.yml -i inventory.yml 
+        run: ansible-playbook playbook.yml -i inventory.yml -vvv
         working-directory: 'ansible'
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
@@ -72,3 +78,4 @@ jobs:
         run: terraform destroy -auto-approve
         env:
           TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
+        working-directory: 'ansible'
