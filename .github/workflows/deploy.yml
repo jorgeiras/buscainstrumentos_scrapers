@@ -14,6 +14,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: 'latest'
+          terraform_wrapper: false
           
       - name: Terraform Init and Apply
         run: |
@@ -31,8 +32,7 @@ jobs:
       - name: Get Droplet IP
         id: get-ip
         run: |
-          IP=$(terraform output -raw droplet_ip | grep -Eo "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
-          echo "DROPLET_IP=${IP}" >> $GITHUB_ENV
+          echo "DROPLET_IP=$(terraform output -raw droplet_ip)" >> $GITHUB_ENV
         working-directory: terraformFiles
         
       - name: Debug droplet IP
