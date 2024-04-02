@@ -42,7 +42,7 @@ jobs:
       - name: Setup SSH
         run: |
           echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile
-          chmod 600 keyfile.pem
+          chmod 600 keyfile
         working-directory: ansible
           
       - name: Setup Ansible Inventory
