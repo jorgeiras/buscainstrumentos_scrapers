@@ -60,6 +60,15 @@ jobs:
           pwd
           ls -lah
         working-directory: ansible
+
+      - name: Wait for SSH service to be ready
+        run: |
+          ATTEMPTS=0
+          until ssh -o "StrictHostKeyChecking=no" -i keyfile.pem root@${{ env.DROPLET_IP }} "echo 'SSH is up'" || [ $ATTEMPTS -eq 10 ]; do
+            ATTEMPTS=$((ATTEMPTS+1))
+            echo "Waiting for SSH to be ready (attempt $ATTEMPTS)..."
+            sleep 10
+          done
   
       - name: Run Ansible Playbook
         run: ansible-playbook playbook.yml -i inventory.yml -vvv
