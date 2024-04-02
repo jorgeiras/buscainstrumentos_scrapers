@@ -40,14 +40,14 @@ jobs:
           echo "Droplet IP is ${{ env.DROPLET_IP }}"
       - name: Setup SSH
         run: |
-          echo "${{ secrets.SSH_DO_SCRAP_KEY }}" > keyfile.pem
-          chmod 600 keyfile.pem
+          echo "${{ secrets.DO_SCRAPER_KEY }}" > keyfilescrap.pem
+          chmod 600 keyfilescrap.pem
         working-directory: ansible
           
       - name: Setup Ansible Inventory
         run: |
           echo "[droplets]" > inventory.yml
-          echo "${{ env.DROPLET_IP }} ansible_user=root ansible_ssh_private_key_file=keyfile.pem" >> inventory.yml
+          echo "${{ env.DROPLET_IP }} ansible_user=root ansible_ssh_private_key_file=keyfilescrap.pem" >> inventory.yml
         working-directory: ansible
 
       - name: Print Ansible Inventory
@@ -77,4 +77,4 @@ jobs:
         run: terraform destroy -auto-approve
         env:
           TF_VAR_do_token: ${{ secrets.DO_API_KEY }}
-        working-directory: 'ansible'
+        working-directory: terraformFiles
