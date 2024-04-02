@@ -61,7 +61,7 @@ jobs:
           playbook: 'playbook.yml'
           key: ${{ secrets.SSH_DO_SCRAP_KEY }}
           directory: 'ansible'
-          inventory: 'inventory.yml'
+          inventory: 'ansible/inventory.yml'
         env:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASS: ${{ secrets.DB_PASS }}
