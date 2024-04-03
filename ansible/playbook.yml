@@ -49,12 +49,7 @@
       command: "python3 soundmarketScrap.py"
       args:
         chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
-
-    - name: Run reverbScrap.py scraper
-      command: "python3 reverbScrap.py"
-      args:
-        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
-
+    
     - name: Run hispasonicScrap.py scraper
       command: "scrapy runspider hispasonicScrap.py -o hispasonic.csv -t csv"
       args:
@@ -62,6 +57,11 @@
 
     - name: Run guitarristasScrap.py scraper
       command: "scrapy runspider guitarristasScrap.py -o guitarristas.csv -t csv"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+
+    - name: Run reverbScrap.py scraper
+      command: "python3 reverbScrap.py"
       args:
         chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
 
