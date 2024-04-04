@@ -50,7 +50,7 @@
       args:
         chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
       async: 18000 # 5 hours
-      poll: 0
+      poll: 5
       register: python_scraper_job
 
     - name: Run Scrapy scraper scripts asynchronously
@@ -61,18 +61,10 @@
         - { script: 'hispasonicScrap.py', output: 'hispasonic.csv' }
         - { script: 'guitarristasScrap.py', output: 'guitarristas.csv' }
       async: 18000 # 5 hours
-      poll: 0
+      poll: 5
       register: scrapy_scraper_jobs
 
-    # Assuming you combine the async jobs into a single list for checking their status
-    - name: Check scraper scripts completion
-      async_status:
-        jid: "{{ item.ansible_job_id }}"
-      loop: "{{ python_scraper_job.results + scrapy_scraper_jobs.results }}"
-      until: item.finished
-      retries: 360
-      delay: 60
-      register: scraper_jobs_result
+    
 
     - name: Run database loader scripts
       command: "python3 {{ item }}"
