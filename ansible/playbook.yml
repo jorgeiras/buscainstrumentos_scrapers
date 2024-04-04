@@ -48,7 +48,7 @@
     - name: Run Python scraper script asynchronously
       command: "python3 soundmarketScrap.py"
       args:
-        chdir: "/path/to/scrapers"
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
       async: 18000 # 5 hours
       poll: 0
       register: python_scraper_job
@@ -56,7 +56,7 @@
     - name: Run Scrapy scraper scripts asynchronously
       shell: "scrapy runspider {{ item.script }} -o {{ item.output }}"
       args:
-        chdir: "/path/to/scrapers"
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
       loop:
         - { script: 'hispasonicScrap.py', output: 'hispasonic.csv' }
         - { script: 'guitarristasScrap.py', output: 'guitarristas.csv' }
