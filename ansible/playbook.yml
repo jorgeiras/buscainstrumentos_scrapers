@@ -45,25 +45,34 @@
         name: es_ES.UTF-8
         state: present
 
-    - name: Run soundmarketScrap.py scraper
+    - name: Run Python scraper script asynchronously
       command: "python3 soundmarketScrap.py"
       args:
-        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
-    
-    - name: Run hispasonicScrap.py scraper
-      command: "scrapy runspider hispasonicScrap.py -o hispasonic.csv -t csv"
-      args:
-        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+        chdir: "/path/to/scrapers"
+      async: 18000 # 5 hours
+      poll: 0
+      register: python_scraper_job
 
-    - name: Run guitarristasScrap.py scraper
-      command: "scrapy runspider guitarristasScrap.py -o guitarristas.csv -t csv"
+    - name: Run Scrapy scraper scripts asynchronously
+      shell: "scrapy runspider {{ item.script }} -o {{ item.output }}"
       args:
-        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+        chdir: "/path/to/scrapers"
+      loop:
+        - { script: 'hispasonicScrap.py', output: 'hispasonic.csv' }
+        - { script: 'guitarristasScrap.py', output: 'guitarristas.csv' }
+      async: 18000 # 5 hours
+      poll: 0
+      register: scrapy_scraper_jobs
 
-    - name: Run reverbScrap.py scraper
-      command: "python3 reverbScrap.py"
-      args:
-        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+    # Assuming you combine the async jobs into a single list for checking their status
+    - name: Check scraper scripts completion
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      loop: "{{ python_scraper_job.results + scrapy_scraper_jobs.results }}"
+      until: item.finished
+      retries: 360
+      delay: 60
+      register: scraper_jobs_result
 
     - name: Run database loader scripts
       command: "python3 {{ item }}"
