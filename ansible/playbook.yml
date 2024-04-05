@@ -53,6 +53,14 @@
       poll: 5
       register: python_scraper_job
 
+    - name: Run Python scraper script asynchronously (reverbScrap.py)
+      command: "python3 reverbScrap.py"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+      async: 18000 # 5 hours
+      poll: 5
+      register: reverb_scraper_job
+
     - name: Run Scrapy scraper scripts asynchronously
       shell: "scrapy runspider {{ item.script }} -o {{ item.output }}"
       args:
