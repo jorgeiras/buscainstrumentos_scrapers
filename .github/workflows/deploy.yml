@@ -2,7 +2,7 @@ name: Deploy and Run Scrapers
 
 on:
   schedule:
-    - cron: '13 23 * * *'
+    - cron: '35 23 * * *'
 
 jobs:
   deploy-and-run:
