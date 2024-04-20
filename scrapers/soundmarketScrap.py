@@ -19,6 +19,8 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
@@ -48,6 +50,7 @@ except Exception as e:
 # Busco el boton para cargar mas informacion
 boton = driver.find_element(By.XPATH, '//button[@class="stw-flex stw-justify-center stw-border stw-border-orange stw-rounded-sm stw-bg-orange stw-p-2 stw-text-center stw-text-lg stw-font-bold stw-text-white stw-mt-10 stw-mx-auto stw-w-60 stw-cursor-pointer hover:stw-bg-orange-light hover:stw-border-orange-light hover:stw-text-white"]')
                
+initial_count = len(driver.find_elements(By.XPATH, '//div[@class="stw-flex stw-w-full stw-overflow-x-auto stw-pb-1.5 stw-flex-wrap"]/div'))
 while True: # Voy a darle click en cargar mas 3 veces
     try:
         # le doy click
@@ -55,8 +58,16 @@ while True: # Voy a darle click en cargar mas 3 veces
         print('------SE CLICKO EL BOTON-----')
         # espero que cargue la informacion dinamica
         sleep(random.uniform(8.0, 10.0))
+
+        new_count = len(driver.find_elements(By.XPATH, '//div[@class="stw-flex stw-w-full stw-overflow-x-auto stw-pb-1.5 stw-flex-wrap"]/div'))
+        if new_count == initial_count:
+            print('No new items loaded.')
+            break  # Break the loop if no new items were added
+        initial_count = new_count 
+        
         # busco el boton nuevamente para darle click en la siguiente iteracion
         boton = driver.find_element(By.XPATH, '//button[@class="stw-flex stw-justify-center stw-border stw-border-orange stw-rounded-sm stw-bg-orange stw-p-2 stw-text-center stw-text-lg stw-font-bold stw-text-white stw-mt-10 stw-mx-auto stw-w-60 stw-cursor-pointer hover:stw-bg-orange-light hover:stw-border-orange-light hover:stw-text-white"]')
+        
     except Exception as e:
         # si hay algun error, rompo el lazo. No me complico.
         print('------ERROR AL CLICKAR-----')
