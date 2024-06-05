@@ -50,33 +50,63 @@
         name: es_ES.UTF-8
         state: present
 
-    - name: Run Python scraper script asynchronously
-      command: "python3 soundmarketScrap.py"
+
+    - name: Run Python scraper scripts (soundmarket)
+      command: "python3 {{ item.script }}"
       args:
-        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
-      async: 18000 # 5 hours
+          chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+      async: 18000
       poll: 5
       register: python_scraper_job
+      when: item.category == category and item.website == 'soundmarket'
+      with_items:
+        - { category: 'guitar', website: 'soundmarket', script: 'soundmarketScrap_guitar.py' }
+        - { category: 'bass', website: 'soundmarket', script: 'soundmarketScrap_bass.py' }
+        - { category: 'drums', website: 'soundmarket', script: 'soundmarketScrap_drums.py' }
+        - { category: 'keys', website: 'soundmarket', script: 'soundmarketScrap_keys.py' }
 
-    - name: Run Python scraper script asynchronously (reverbScrap.py)
-      command: "python3 reverbScrap.py"
+
+    - name: Run Python scraper scripts (reverbScrap.py)
+      command: "python3 {{ item.script }}"
       args:
         chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
-      async: 18000 # 5 hours
+      async: 18000
       poll: 5
-      register: reverb_scraper_job
+      register: python_scraper_job
+      when: item.category == category and item.website == 'reverb'
+      with_items:
+        - { category: 'guitar', website: 'reverb', script: 'reverbScrap_guitar.py' }
+        - { category: 'bass', website: 'reverb', script: 'reverbScrap_bass.py' }
+        - { category: 'drums', website: 'reverb', script: 'reverbScrap_drums.py' }
+        - { category: 'keys', website: 'reverb', script: 'reverbScrap_keys.py' }
 
-    - name: Run Scrapy scraper scripts asynchronously
+
+    - name: Run Scrapy scraper scripts (hispasonic)
       shell: "scrapy runspider {{ item.script }} -o {{ item.output }}"
       args:
         chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
-      loop:
-        - { script: 'hispasonicScrap.py', output: 'hispasonic.csv' }
-        - { script: 'guitarristasScrap.py', output: 'guitarristas.csv' }
-      async: 18000 # 5 hours
+      async: 18000
       poll: 5
       register: scrapy_scraper_jobs
+      when: item.category == category and item.website == 'hispasonic'
+      loop:
+        - { category: 'guitar', website: 'hispasonic', script: 'hispasonicScrap_guitar.py', output: 'hispasonic.csv' }
+        - { category: 'bass', website: 'hispasonic', script: 'hispasonicScrap_bass.py', output: 'hispasonic.csv' }
+        - { category: 'drums', website: 'hispasonic', script: 'hispasonicScrap_drums.py', output: 'hispasonic.csv' }
+        - { category: 'keys', website: 'hispasonic', script: 'hispasonicScrap_keys.py', output: 'hispasonic.csv' }
 
+
+    - name: Run Scrapy scraper scripts (guitarristas)
+      shell: "scrapy runspider {{ item.script }} -o {{ item.output }}"
+      args:
+        chdir: "/home/{{ ansible_user }}/buscainstrumentos_scrapers/scrapers"
+      async: 18000
+      poll: 5
+      register: scrapy_scraper_jobs
+      when: item.category == category and item.website == 'guitarristas'
+      loop:
+        - { category: 'guitar', website: 'guitarristas', script: 'guitarristasScrap_guitar.py', output: 'guitarristas.csv' }
+        - { category: 'bass', website: 'guitarristas', script: 'guitarristasScrap_bass.py', output: 'guitarristas.csv' }
     
 
     - name: Run database loader scripts

@@ -73,6 +73,20 @@ jobs:
           done
         working-directory: ansible
 
+      - name: Determine Day of the Week
+        id: day
+        run: echo "DAY_OF_WEEK=$(date +%u)" >> $GITHUB_ENV
+
+      - name: Set Category
+        run: |
+          case ${{ env.DAY_OF_WEEK }} in
+            1) echo "CATEGORY=guitar" >> $GITHUB_ENV ;;
+            2) echo "CATEGORY=bass" >> $GITHUB_ENV ;;
+            3) echo "CATEGORY=drums" >> $GITHUB_ENV ;;
+            4) echo "CATEGORY=keys" >> $GITHUB_ENV ;;
+            5) echo "CATEGORY=synths" >> $GITHUB_ENV ;;
+            *) echo "CATEGORY=none" >> $GITHUB_ENV ;;
+          esac
   
       - name: Run Ansible Playbook
         run: ansible-playbook playbook.yml -i inventory.yml -v
@@ -84,6 +98,7 @@ jobs:
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
+          CATEGORY: ${{ env.CATEGORY }}
           
       - name: Destroy Infrastructure
         if: always()

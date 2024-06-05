@@ -21,10 +21,10 @@ class Instrumento(Item):
     website = Field()
 
 
-class HispanoSonicInfoCrawler(CrawlSpider):
-    name = "HispanoSonicInfoCrawler"
-    allowed_domains = ['hispasonic.com']
-    start_urls = ['https://www.hispasonic.com/anuncios/guitarras-bajos']
+class GuitarristasInfoCrawler(CrawlSpider):
+    name = "GuitarristasInfoCrawler"
+    allowed_domains = ['guitarristas.info']
+    start_urls = ['https://www.guitarristas.info/anuncios/guitarras-bajos']
 
     custom_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
@@ -33,14 +33,11 @@ class HispanoSonicInfoCrawler(CrawlSpider):
 
     download_delay = 1
 
-    
-
     rules = {
         Rule(LinkExtractor(allow=r'/anuncios/guitarras-bajos/pagina\d+'), follow=True),
         Rule(LinkExtractor(allow=r'/anuncios/[\w-]+/\d+', restrict_xpaths=['//div[@id="ads"]']), follow=True, callback='parse_items')
 
     }
-
 
     def parse_items(self, response):
         item = ItemLoader(Instrumento(), response)
@@ -52,19 +49,18 @@ class HispanoSonicInfoCrawler(CrawlSpider):
         item.add_xpath('expiration', '//div[@class="layout-simple"]//div[@class="expira"]/text()', MapCompose(self.parse_expiration))
         item.add_xpath('category', '//ul[@class="breadcrumb breadcrumb-dark"]/li[3]//span/text()')
         item.add_xpath('publish', '//div[@class="layout-simple"]/div[@class="grid grid-gutter"]/div[@class="col-lg-7"]/div[1]/text()', MapCompose(self.parse_publish))
-        item.add_value('website', 'hispasonic')
+        item.add_value('website', 'guitarristas.info')
         #itemFinal = item.load_item()
         itemFinal = item.load_item()
         yield itemFinal
-        
-    
+
 
     def parse_expiration(self, texto):
         date_str = texto.split('|')[0].replace('Expiración: ', '').strip()
         date_obj = datetime.strptime(date_str, '%d/%m/%Y')
         formatted_date = date_obj.strftime('%Y-%m-%d')
         return formatted_date
-        
+    
 
     def parse_publish(self, texto):
         locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8' or 'Spanish_Spain')
@@ -95,3 +91,4 @@ class HispanoSonicInfoCrawler(CrawlSpider):
                 return formatted_date
 
         return None
+        

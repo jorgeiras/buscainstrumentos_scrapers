@@ -21,23 +21,25 @@ class Instrumento(Item):
     website = Field()
 
 
-class GuitarristasInfoCrawler(CrawlSpider):
-    name = "GuitarristasInfoCrawler"
-    allowed_domains = ['guitarristas.info']
-    start_urls = ['https://www.guitarristas.info/anuncios/guitarras-bajos']
+class HispanoSonicInfoCrawler(CrawlSpider):
+    name = "HispanoSonicInfoCrawler"
+    allowed_domains = ['hispasonic.com']
+    start_urls = ['https://www.hispasonic.com/anuncios/bateria-percusion']
 
     custom_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-        #'CLOSESPIDER_PAGECOUNT': 20 # Numero maximo de paginas en las cuales voy a descargar items. Scrapy se cierra cuando alcanza este numero
     }
 
     download_delay = 1
 
+    
+
     rules = {
-        Rule(LinkExtractor(allow=r'/anuncios/guitarras-bajos/pagina\d+'), follow=True),
+        Rule(LinkExtractor(allow=r'/anuncios/bateria-percusion/pagina\d+'), follow=True),
         Rule(LinkExtractor(allow=r'/anuncios/[\w-]+/\d+', restrict_xpaths=['//div[@id="ads"]']), follow=True, callback='parse_items')
 
     }
+
 
     def parse_items(self, response):
         item = ItemLoader(Instrumento(), response)
@@ -49,18 +51,18 @@ class GuitarristasInfoCrawler(CrawlSpider):
         item.add_xpath('expiration', '//div[@class="layout-simple"]//div[@class="expira"]/text()', MapCompose(self.parse_expiration))
         item.add_xpath('category', '//ul[@class="breadcrumb breadcrumb-dark"]/li[3]//span/text()')
         item.add_xpath('publish', '//div[@class="layout-simple"]/div[@class="grid grid-gutter"]/div[@class="col-lg-7"]/div[1]/text()', MapCompose(self.parse_publish))
-        item.add_value('website', 'guitarristas.info')
-        #itemFinal = item.load_item()
+        item.add_value('website', 'hispasonic')
         itemFinal = item.load_item()
         yield itemFinal
-
+        
+    
 
     def parse_expiration(self, texto):
         date_str = texto.split('|')[0].replace('Expiración: ', '').strip()
         date_obj = datetime.strptime(date_str, '%d/%m/%Y')
         formatted_date = date_obj.strftime('%Y-%m-%d')
         return formatted_date
-    
+        
 
     def parse_publish(self, texto):
         locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8' or 'Spanish_Spain')
@@ -91,47 +93,3 @@ class GuitarristasInfoCrawler(CrawlSpider):
                 return formatted_date
 
         return None
-        
-        """
-        # connect to database
-        conn = psycopg2.connect(database='instrCopyDB', user='postgres',
-                                password='admin', host='localhost', port='5432')
-        cursor = conn.cursor()
-
-        price_text = itemFinal.get("price")
-        if price_text:
-            price_text = itemFinal.get("price")[0].strip()
-        else:
-            price_text = "00"
-        priceInt = int(price_text)
-        # check if the item is already in the database
-        sql = 'SELECT COUNT(*) FROM "instrCopyAPI_instrument" WHERE name = %s::character varying AND price = %s AND link = %s::character varying AND website = %s::character varying AND image = %s::character varying AND location = %s::character varying AND category = %s::character varying'
-        cursor.execute(sql, (itemFinal.get('name')[0].strip('[]\''), priceInt, itemFinal.get('link')[0].strip('[]\''), "guitarristas.info", itemFinal.get('image', 'null')[0].strip('[]\''), itemFinal.get('location', 'null')[0].strip('[]\''), "guitarras"))  #itemFinal.get('category', 'null')[0].strip('[]\'')
-        count = cursor.fetchone()[0]
-
-        if count == 0:
-            sql = 'INSERT INTO "instrCopyAPI_instrument" (name, price, link, website, image, location, category, expiration) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-            # get the values from the item
-            values = (itemFinal.get('name')[0].strip('[]\''), priceInt, itemFinal.get('link')[0].strip('[]\''), "guitarristas.info", itemFinal.get('image', 'null')[0].strip('[]\''), itemFinal.get('location', 'null')[0].strip('[]\''), "guitarras", itemFinal.get('expiration')[0])
-            print(values)
-            # execute the statement
-            cursor.execute(sql, values)
-            # commit the transaction
-            conn.commit()
-    
-        
-    def parse_expiration(self, texto):
-        pattern = r'\d{2}/\d{2}/\d{4}'
-        match = re.search(pattern, texto)
-
-        if match:
-            date_str = match.group()
-            date_obj = datetime.strptime(date_str, '%d/%m/%Y').date()
-        else:
-            date_obj = None
-        
-        return date_obj
-        """
-
-
-    

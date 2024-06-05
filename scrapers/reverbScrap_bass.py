@@ -26,7 +26,7 @@ def iterate_prices(writer):
         else:
             max_price = min_price + 10
 
-        extract_data('electric-guitars',min_price, max_price, writer)
+        extract_data('bass-guitars',min_price, max_price, writer)
 
 
 
@@ -53,7 +53,7 @@ def extract_data(product_type,price_min, price_max, writer):
             print(itemListing['price']['amount'])
             print(itemListing['_links']['web']['href'])
             item = {
-                'category' : itemListing['categories'][0]['full_name'],
+                'category' : 'bajos',
                 'image' : itemListing['_links']['photo']['href'],
                 'link' : itemListing['_links']['web']['href'],
                 'name' : itemListing['title'],
