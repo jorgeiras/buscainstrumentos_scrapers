@@ -2,6 +2,8 @@
 - name: Setup and Run Scrapers
   hosts: all
   become: yes
+  vars:
+    category: "{{ lookup('env', 'CATEGORY') }}"
   tasks:
     - name: Update apt cache
       apt:
