@@ -1,7 +1,12 @@
 import psycopg2
 import os
+import sys
 
 csv_file_path = '../scrapers/hispasonic.csv'
+
+if not os.path.isfile(csv_file_path):
+    print(f"CSV file {csv_file_path} does not exist. Exiting script.")
+    sys.exit(0)
 
 # connect to database
 conn = psycopg2.connect(database=os.environ.get('DB_NAME'), user=os.environ.get('DB_USER'), password=os.environ.get('DB_PASS'), host=os.environ.get('DB_HOST'), port=os.environ.get('DB_PORT'))

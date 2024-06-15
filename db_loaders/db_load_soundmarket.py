@@ -1,9 +1,14 @@
 import psycopg2
 import csv
 import os
+import sys
 
 csv_file_path = '../scrapers/soundmarket.csv'
 csv_file_path_clean = '../scrapers/soundmarket_clean.csv'
+
+if not os.path.isfile(csv_file_path):
+    print(f"CSV file {csv_file_path} does not exist. Exiting script.")
+    sys.exit(0)
 
 #clean csv duplicates 
 unique_links = set()
