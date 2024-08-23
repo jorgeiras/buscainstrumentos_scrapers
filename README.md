@@ -58,12 +58,11 @@ This project automates the process of extracting, transforming, and loading (ETL
      - In addition to Scrapy, custom Python scriptsare used to handle specific scraping scenarios or to preprocess data before transformation.
 
 6. **Data Transformation (Transform)**
-   - **Data Cleaning**: The raw data collected by the scrapers is cleaned to remove any inconsistencies, duplicates, or irrelevant information. This step is crucial to ensure that the data is accurate and usable.
-   - **Data Structuring**: The cleaned data is organized into a structured format, typically as CSV files. The structure is standardized, making it easy to load into a database and ensuring that the data can be efficiently queried and analyzed.
+   - **Data Cleaning**: The raw data collected by the scrapers is cleaned to remove any inconsistencies, duplicates, or irrelevant information.
+   - **Data Structuring**: The cleaned data is organized into a structured format, as CSV files. The structure is standardized, making it easy to load into a database and ensuring that the data can be efficiently queried and analyzed.
 
 7. **Data Loading (Load)**
-   - **Database Insertion**: The transformed data is loaded into a PostgreSQL database. This step involves inserting the cleaned and structured data into the appropriate tables, making it accessible for further use by the BuscaInstrumentos backend.
-   - **Data Verification**: After the data is loaded into the database, a verification process ensures that the data has been accurately inserted and is ready for use.
+   - **Database Insertion**: The transformed data is loaded into a PostgreSQL database. This step involves inserting the cleaned and structured data into the Instrument table, making it accessible for further use by the BuscaInstrumentos backend.
 
 8. **Teardown**
    - **Droplet Destruction**: After the ETL process is complete, Terraform automatically destroys the DigitalOcean droplet. This cleanup step is essential for cost management, ensuring that no unnecessary resources are left running.
