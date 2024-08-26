@@ -86,4 +86,6 @@ The infrastructure for this project is fully automated and cloud-based. The foll
 This infrastructure setup not only supports the efficient and automated operation of the scrapers but also enhances the reliability and effectiveness of the data extraction process by leveraging dynamic IPs and a stable OS environment.
 
 ### Contact
-
+For more information or inquiries, you can reach me on LinkedIn or via email:
+- **LinkedIn**: (www.linkedin.com/in/jorge-alonso-urrutia-544022261)
+- **Email**: [alonsourrutia.jor@gmail.com](mailto:alonsourrutia.jor@gmail.com)
